@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unam Marking System</title>
+</head>
+<body>
+    <h1>Student Marks</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Student Number</th>
+                <th>Full Name</th>
+                <th>CA Mark</th>
+                <th>Exam Mark</th>
+                <th>Final Mark</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody id="UnamMarksTable">
+        </tbody>
+    </table>
+    <script>
+        const students = [
+            { studentNumber: '20128971', fullName: 'Tonata', caMark: '', examMark: '', finalMark: '', grade: '' },
+            { studentNumber: '20120881', fullName: 'Ton-ton', caMark: '', examMark: '', finalMark: '', grade: '' },
+            { studentNumber: '21982717', fullName: 'Richard', caMark: '', examMark: '', finalMark: '', grade: '' },
+        ];
+        function calulateStudentMarks() {
+            const infoStudent = document.getElementById('UnamMarksTable');
+            infoStudent.innerHTML = '';
+
+            students.forEach((student, value) => {
+                const rowInfo = document.createElement('tr');
+                rowInfo.innerHTML = `
+                    <td>${student.studentNumber}</td>
+                    <td>${student.fullName}</td>
+                    <td><input type="number" id="caMark_${value}" oninput="CalculateMarks(${value})"></td>
+                    <td><input type="number" id="examMark_${value}" oninput="CalculateMarks(${value})"></td>
+                    <td><span id="finalMark_${value}">${student.finalMark}</span></td>
+                    <td><span id="grade_${value}">${student.grade}</span></td>
+                `;
+                infoStudent.appendChild(rowInfo);
+            });
+        }
+        function CalculateMarks(value) {
+            const caInput = document.getElementById(`caMark_${value}`);
+            const examInput = document.getElementById(`examMark_${value}`);
+            const finalMarkSpan = document.getElementById(`finalMark_${value}`);
+            const gradeSpan = document.getElementById(`grade_${value}`);
+
+            const caMark = parseFloat(caInput.value) || 0;
+            const examMark = parseFloat(examInput.value) || 0;
+            const finalMark = (caMark + examMark) / 2;
+            const grade = finalMark >= 70 ? 'A' : (finalMark >= 50 ? 'B' : 'C');
+
+            students[value].caMark = caMark;
+            students[value].examMark = examMark;
+            students[value].finalMark = finalMark;
+            students[value].grade = grade;
+
+            finalMarkSpan.textContent = finalMark.toFixed(2);
+            gradeSpan.textContent = grade;
+
+            localStorage.setItem('studentInfo', JSON.stringify(students));
+        }
+
+        window.onload = function() {
+            const storedData = localStorage.getItem('studentInfo');
+            if (storedData) {
+                const parsedData = JSON.parse(storedData);
+                students.forEach((student, value) => {
+                    student.caMark = parsedData[value].caMark;
+                    student.examMark = parsedData[value].examMark;
+                    student.finalMark = parsedData[value].finalMark;
+                    student.grade = parsedData[value].grade;
+                });
+            }
+            calulateStudentMarks();
+        };
+    </script>
+</body>
+</html>
